@@ -456,3 +456,37 @@ def copilot_response(question: str, snapshot: TelemetrySnapshot) -> str:
         "I can analyze simulated incidents, service health, latency, costs, and deployments "
         "for the current Command Center filters. This copilot uses demo telemetry only."
     )
+
+
+def telemetry_seed(*parts: object) -> int:
+    """Public wrapper for deterministic telemetry seed generation."""
+    return _seed(*parts)
+
+
+def telemetry_unit(seed: int, offset: int) -> float:
+    """Public wrapper for deterministic unit-interval values."""
+    return _unit(seed, offset)
+
+
+def get_service_profile(service: str) -> dict[str, float]:
+    """Public wrapper for service profile lookup."""
+    return _service_profile(service)
+
+
+__all__ = [
+    "ENVIRONMENTS",
+    "Incident",
+    "KpiMetric",
+    "SERVICES",
+    "SERVICE_LABELS",
+    "SERVICE_SLUGS",
+    "TIME_RANGES",
+    "TelemetrySnapshot",
+    "build_kpis",
+    "copilot_response",
+    "get_cloud_resources",
+    "get_service_profile",
+    "get_snapshot",
+    "telemetry_seed",
+    "telemetry_unit",
+]

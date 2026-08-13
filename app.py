@@ -3,6 +3,8 @@ import time
 import plotly.graph_objects as go
 import streamlit as st
 
+from app.incident_ui import render_incident_intelligence
+from services.incident_service import build_investigation, find_incident
 from telemetry import (
     ENVIRONMENTS,
     Incident,
@@ -33,6 +35,8 @@ def init_session_state() -> None:
         "auto_refresh": False,
         "data_version": 0,
         "selected_incident_id": None,
+        "show_investigation": False,
+        "investigation_incident_id": None,
         "messages": None,
         "last_auto_refresh": time.time(),
     }
@@ -49,6 +53,44 @@ def load_snapshot(
     data_version: int,
 ) -> TelemetrySnapshot:
     return get_snapshot(environment, service, time_range, data_version)
+
+
+@st.cache_data(show_spinner=False)
+def load_investigation(
+    environment: str,
+    service: str,
+    time_range: str,
+    data_version: int,
+    incident_id: str | None,
+):
+    snapshot = get_snapshot(environment, service, time_range, data_version)
+    incident = find_incident(snapshot, incident_id)
+    return build_investigation(incident, snapshot)
+
+
+def open_incident_investigation(incident_id: str) -> None:
+    st.session_state.show_investigation = True
+    st.session_state.investigation_incident_id = incident_id
+    st.session_state.selected_incident_id = incident_id
+
+
+def render_investigation_panel(incident_id: str | None) -> None:
+    if not st.session_state.show_investigation or not incident_id:
+        return
+
+    investigation = load_investigation(
+        st.session_state.environment,
+        st.session_state.service,
+        st.session_state.time_range,
+        st.session_state.data_version,
+        incident_id,
+    )
+    if investigation is None:
+        st.warning("Unable to load incident intelligence for the selected incident.")
+        return
+
+    st.divider()
+    render_incident_intelligence(investigation)
 
 
 def render_styles() -> None:
@@ -473,6 +515,12 @@ Intelligent cloud operations, analytics & AI decision support
         )
         render_incident_detail(selected_incident)
 
+        if st.button("Open Incident Intelligence", type="primary", width="stretch"):
+            open_incident_investigation(selected_incident.id)
+            st.rerun()
+
+        render_investigation_panel(st.session_state.investigation_incident_id)
+
     render_footer()
 
 elif page == "Incidents":
@@ -502,10 +550,40 @@ elif page == "Incidents":
     if not filtered:
         st.info("No incidents match the selected severity filters.")
     else:
+        incident_ids = [item.id for item in filtered]
+        if st.session_state.investigation_incident_id not in incident_ids:
+            st.session_state.investigation_incident_id = incident_ids[0]
+
+        selected_id = st.selectbox(
+            "Select incident to investigate",
+            incident_ids,
+            format_func=lambda incident_id: next(
+                item.title for item in filtered if item.id == incident_id
+            ),
+            key="incidents_page_selector",
+        )
+
         for incident in filtered:
-            render_incident_card(incident)
-            with st.expander(f"View details — {incident.service_label}"):
-                render_incident_detail(incident)
+            render_incident_card(
+                incident,
+                selected=incident.id == selected_id,
+            )
+
+        action_col1, action_col2 = st.columns(2)
+        with action_col1:
+            if st.button("Open Incident Intelligence", type="primary", width="stretch"):
+                open_incident_investigation(selected_id)
+                st.rerun()
+        with action_col2:
+            if st.button("Close Investigation", width="stretch"):
+                st.session_state.show_investigation = False
+                st.rerun()
+
+        selected_incident = next(item for item in filtered if item.id == selected_id)
+        with st.expander(f"Quick summary — {selected_incident.service_label}", expanded=False):
+            render_incident_detail(selected_incident)
+
+        render_investigation_panel(st.session_state.investigation_incident_id)
 
     render_footer()
 
