@@ -3,6 +3,7 @@ import time
 import plotly.graph_objects as go
 import streamlit as st
 
+from app.copilot_ui import render_copilot_page
 from app.incident_ui import render_incident_intelligence
 from services.incident_service import build_investigation, find_incident
 from telemetry import (
@@ -12,7 +13,6 @@ from telemetry import (
     TIME_RANGES,
     TelemetrySnapshot,
     build_kpis,
-    copilot_response,
     get_cloud_resources,
     get_snapshot,
 )
@@ -608,43 +608,7 @@ elif page == "Analytics":
     render_footer()
 
 elif page == "AI Copilot":
-    st.html("""
-<div class="ai-card">
-<div class="ai-title">NEXUS INTELLIGENCE</div>
-<div class="ai-heading">AI Copilot</div>
-<p class="ai-text">
-Ask about incidents, service health, latency spikes, deployments, or infrastructure cost.
-Responses are generated from simulated demo telemetry for the current sidebar filters.
-</p>
-</div>
-""")
-
-    if st.session_state.messages is None:
-        st.session_state.messages = [
-            {
-                "role": "assistant",
-                "content": (
-                    "NexusOps AI online. I can analyze simulated operational telemetry for "
-                    f"{snapshot.environment} / {snapshot.service} / {snapshot.time_range}. "
-                    "What would you like to investigate?"
-                ),
-            }
-        ]
-
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
-
-    if prompt := st.chat_input("Ask NexusOps about your infrastructure..."):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.write(prompt)
-
-        response = copilot_response(prompt, snapshot)
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        with st.chat_message("assistant"):
-            st.write(response)
-
+    render_copilot_page(snapshot)
     render_footer()
 
 elif page == "Cloud Resources":
