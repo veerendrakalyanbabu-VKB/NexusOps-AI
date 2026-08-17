@@ -173,7 +173,7 @@ def render_styles() -> None:
         border-radius: 18px;
         padding: 20px;
         min-height: 125px;
-        box-shadow: 0 12px 40px rgba(0,0,0,0,.18);
+        box-shadow: 0 12px 40px rgba(0,0,0,.18);
     }
 
     .metric-label {
