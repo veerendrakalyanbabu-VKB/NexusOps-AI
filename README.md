@@ -1,12 +1,12 @@
-# ⚡ NexusOps AI
+# NexusOps AI
 
-An AI-Powered Engineering & Cloud Operations Intelligence Platform designed to help engineering and DevOps teams monitor infrastructure health, investigate incidents, correlate operational signals, and make faster evidence-based operational decisions.
+A portfolio implementation of an operations intelligence workspace for exploring infrastructure health, incident context, correlated signals, and evidence-backed investigation paths.
 
-Built using **Python, Streamlit, Pandas, Plotly, Pytest and AI Provider Abstraction**.
+The application is built with **Python, Streamlit, Pandas, Plotly, pytest, and a provider abstraction for optional AI-assisted analysis**.
 
 **🌐 Live Demo:** [nexusops-ai-y6cvwvktst6dq2peeudqsz.streamlit.app](https://nexusops-ai-y6cvwvktst6dq2peeudqsz.streamlit.app/)
 
-**💻 GitHub Repository:** [github.com/veerendrakalyanbabu-VKB/nexusops-ai](https://github.com/veerendrakalyanbabu-VKB/nexusops-ai)
+**💻 GitHub Repository:** [github.com/veerendrakalyanbabu-VKB/nexusops-ai](https://github.com/veerendrakalyanbabu-VKB/NexusOps-AI)
 
 ---
 
